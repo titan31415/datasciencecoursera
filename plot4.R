@@ -1,0 +1,39 @@
+data <- read.table("household_power_consumption.txt", header = TRUE, sep = ";", nrows = 5)
+classes <- sapply(data, class)
+classes[1:2] <- "character"
+# 66637
+# 68078
+# 69516
+data <- read.table("household_power_consumption.txt", header = TRUE, sep = ";",
+                   col.names = c("Date", "Time", "Global_active_power", "Global_reactive_power",
+                                 "Voltage", "Global_intensity", "Sub_metering_1",
+                                 "Sub_metering_2", "Sub_metering_3"),
+                   na.strings = "?", colClass = classes, skip = 66636, nrows = 2880,
+                   comment.char = "")
+data$Date <- strptime(data$Date, "%d/%m/%Y")
+library(chron)
+data$Time <- times(data$Time)
+
+png(filename = "plot4.png", width = 480, height = 480)
+par(mfrow = c(2, 2))
+plot(data$Global_active_power, type = "s", xaxt = "n", xlab = "", 
+     ylab = "Global Active Power")
+axis(1, at = c(1, 1439, 2880), labels = c("Thu", "Fri", "Sat"))
+
+plot(data$Voltage, type = "s", xaxt = "n", xlab = "datetime", 
+     ylab = "Voltage")
+axis(1, at = c(1, 1439, 2880), labels = c("Thu", "Fri", "Sat"))
+
+plot(data$Sub_metering_1, type = "s", xaxt = "n", xlab = "", 
+     ylab = "Energy sub metering")
+lines(data$Sub_metering_2, type = "s", col = "red")
+lines(data$Sub_metering_3, type = "s", col = "blue")
+axis(1, at = c(1, 1439, 2880), labels = c("Thu", "Fri", "Sat"))
+legend("topright", legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"),
+       lty = 1, bty = "n", col = c("black", "red", "blue"))
+
+plot(data$Global_reactive_power, type = "s", xaxt = "n", xlab = "datetime", 
+     ylab = "Global_reactive_power")
+axis(1, at = c(1, 1439, 2880), labels = c("Thu", "Fri", "Sat"))
+
+dev.off()
